@@ -1,14 +1,15 @@
 name: CI Pipeline
+
 on: push
 
 jobs:
   # ───────────────────────────────────────────────────────────────────────
-  # 🛠️ Job 1: Setup Environment (Shared Dependency)
+  # 🛠️ Job 1: Setup Python & Install Dependencies
   # ───────────────────────────────────────────────────────────────────────
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      python-cache-key: ${{ steps.cache-pip.outputs.cache-key }}
+      pip-cache-key: ${{ steps.cache-pip.outputs.cache-key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -29,10 +30,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install Dependencies
+      - name: Install Dependencies System-Wide
         run: |
-          pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow
+          python -m pip install --upgrade pip
+          pip install --user -r requirements.txt
+          pip install --user dvc[s3] dagshub mlflow boto3
+
+      - name: Verify DVC Installation
+        run: |
+          ~/.local/bin/dvc --version
 
   # ───────────────────────────────────────────────────────────────────────
   # 📥 Job 2: Configure DVC & Pull Data
@@ -47,12 +53,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Restore Virtual Environment
-        uses: actions/cache@v3
-        with:
-          path: venv
-          key: ${{ needs.setup-environment.outputs.venv-cache-key }}
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -63,13 +63,9 @@ jobs:
       - name: Configure DVC S3 Remote
         run: |
           set -e
-          source venv/bin/activate
-          
-          dvc remote default origin
+          ~/.local/bin/dvc remote default origin
 
       - name: Pull DVC Data
         run: |
           set -e
-          source venv/bin/activate
-          dvc pull -v
-
+          ~/.local/bin/dvc pull -v
