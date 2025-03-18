@@ -1,50 +1,56 @@
 name: CI Pipeline
-
 on: push
 
 jobs:
   # ───────────────────────────────────────────────────────────────────────
-  # 🛠️ Job 1: Setup Environment
+  # 🛠️ Job 1: Setup Environment (Shared Dependency)
   # ───────────────────────────────────────────────────────────────────────
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
+      python-cache-key: ${{ steps.cache-pip.outputs.cache-key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required for full DVC commit history
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Cache Virtual Environment
-        id: cache-venv
+      - name: Cache pip dependencies
+        id: cache-pip
         uses: actions/cache@v3
         with:
-          path: venv
-          key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-
-      - name: Create and Activate Virtual Environment
-        run: |
-          set -e  # Stop execution on error
-          python -m venv venv
-          if [ -d "venv/bin" ]; then
-            echo "✅ Virtual environment created successfully"
-          else
-            echo "❌ Failed to create virtual environment" >&2
-            exit 1
-          fi
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install Dependencies
         run: |
-          set -e
-          source venv/bin/activate
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow boto3
+          pip install dvc[s3] dagshub mlflow
 
+      - name: Configure DVC & MLflow
+        env:
+          DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          # Configure DVC authentication for DagsHub
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user $DAGSHUB_USER
+          dvc remote modify origin --local password $DAGSHUB_TOKEN
+
+          # Configure S3 storage
+          dvc remote add -d s3storage s3://your-data-bucket/dvc-store
+          dvc remote modify s3storage endpointurl https://s3.ap-southeast-2.amazonaws.com
+          dvc remote modify s3storage --local access_key_id $AWS_ACCESS_KEY_ID
+          dvc remote modify s3storage --local secret_access_key $AWS_SECRET_ACCESS_KEY
   # ───────────────────────────────────────────────────────────────────────
   # 📥 Job 2: Configure DVC & Pull Data
   # ───────────────────────────────────────────────────────────────────────
@@ -75,14 +81,6 @@ jobs:
         run: |
           set -e
           source venv/bin/activate
-          
-          # Check if DVC remote exists
-          if ! dvc remote list | grep -q "origin"; then
-            dvc remote add origin s3://your-dvc-bucket/path
-            dvc remote modify origin endpointurl https://s3.${{ env.AWS_REGION }}.amazonaws.com
-            dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-            dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          fi
           
           dvc remote default origin
 
