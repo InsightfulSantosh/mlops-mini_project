@@ -32,7 +32,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --no-cache-dir --upgrade --user dvc[s3] dagshub mlflow
+          pip install --no-cache-dir --upgrade dvc[s3] dagshub mlflow
 
   # ───────────────────────────────────────────────────────────────────────
   # 📥 Job 2: Configure DVC & Pull Data
@@ -42,16 +42,15 @@ jobs:
     needs: setup-environment
     if: success()
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}  # Use GitHub Secrets for AWS region
+      AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Ensure DVC is Accessible
+      - name: Debug DVC Installation
         run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          export PATH=$HOME/.local/bin:$PATH
-          which dvc  # Debugging step
+          which dvc
+          dvc --version
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
