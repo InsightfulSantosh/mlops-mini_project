@@ -1,0 +1,78 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 618b85886fec7b67935b10da513d318d
+      size: 5778
+    params:
+      params.yaml:
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: d86336407faad66f4d73b3c5975d323b.dir
+      size: 817597
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data/data_preprocessing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: d86336407faad66f4d73b3c5975d323b.dir
+      size: 817597
+      nfiles: 2
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: 4a73c347cc9c1b94ed3316755fb5b2c8
+      size: 6896
+    outs:
+    - path: data/interim
+      hash: md5
+      md5: 85b7fddb0c61bc5e223152c4b90afb81.dir
+      size: 501805
+      nfiles: 2
+  feature_engineering:
+    cmd: python src/features/feature_engineering.py
+    deps:
+    - path: data/interim
+      hash: md5
+      md5: 85b7fddb0c61bc5e223152c4b90afb81.dir
+      size: 501805
+      nfiles: 2
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: b08dd811280c414bb41f604020d1a1dd
+      size: 4740
+    params:
+      params.yaml:
+        feature_engineering.max_features: 1000
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 31f55dfd63e3dc984637cd5c9d56ec47.dir
+      size: 20776540
+      nfiles: 2
+    - path: models/vectorizer.pkl
+      hash: md5
+      md5: 0b232e56bb706646f6651e21bea51e77
+      size: 27608
+  model_building:
+    cmd: python src/model/model_building.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 31f55dfd63e3dc984637cd5c9d56ec47.dir
+      size: 20776540
+      nfiles: 2
+    - path: src/model/model_building.py
+      hash: md5
+      md5: 0b6e6174be23f81a728ec4b590e7eb97
+      size: 2912
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: c315a6ac378f12d31ea63596b802f1cc
+      size: 20541

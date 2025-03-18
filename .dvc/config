@@ -1,5 +1,6 @@
 [core]
     remote = myremote
+    autostage = true
 ['remote "myremote"']
     url = s3://emmy-database
     region = eu-north-1
