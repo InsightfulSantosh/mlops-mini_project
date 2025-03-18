@@ -37,45 +37,6 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   # 📥 Job 2: Configure DVC & Pull Data
   # ───────────────────────────────────────────────────────────────────────
-  name: CI Pipeline
-
-on: push
-
-jobs:
-  # ───────────────────────────────────────────────────────────────────────
-  # 🛠️ Job 1: Setup Environment
-  # ───────────────────────────────────────────────────────────────────────
-  setup-environment:
-    runs-on: ubuntu-latest
-    outputs:
-      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Cache Virtual Environment
-        id: cache-venv
-        uses: actions/cache@v3
-        with:
-          path: venv
-          key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-
-      - name: Install Dependencies
-        run: |
-          set -e  # Stop execution on error
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow boto3
-
-  # ───────────────────────────────────────────────────────────────────────
-  # 📥 Job 2: Configure DVC & Pull Data
-  # ───────────────────────────────────────────────────────────────────────
   pull-dvc-data:
     runs-on: ubuntu-latest
     needs: setup-environment
@@ -95,9 +56,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Configure DVC S3 Remote
         run: |
@@ -119,12 +80,3 @@ jobs:
           set -e
           source venv/bin/activate
           dvc pull -v
-
-
-
-  
-
-
-
-
-   
