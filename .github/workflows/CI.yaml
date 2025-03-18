@@ -26,11 +26,22 @@ jobs:
           path: venv
           key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
 
-      - name: Install Dependencies
+      - name: Create and Activate Virtual Environment
         run: |
           set -e  # Stop execution on error
           python -m venv venv
+          if [ -d "venv/bin" ]; then
+            echo "✅ Virtual environment created successfully"
+          else
+            echo "❌ Failed to create virtual environment" >&2
+            exit 1
+          fi
+
+      - name: Install Dependencies
+        run: |
+          set -e
           source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[s3] dagshub mlflow boto3
 
@@ -42,7 +53,7 @@ jobs:
     needs: setup-environment
     if: success()
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}  # Dynamically set AWS region
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Use GitHub Secrets for AWS region
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -64,15 +75,15 @@ jobs:
         run: |
           set -e
           source venv/bin/activate
-          dvc remote list || true  
-
+          
+          # Check if DVC remote exists
           if ! dvc remote list | grep -q "origin"; then
             dvc remote add origin s3://your-dvc-bucket/path
             dvc remote modify origin endpointurl https://s3.${{ env.AWS_REGION }}.amazonaws.com
             dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           fi
-
+          
           dvc remote default origin
 
       - name: Pull DVC Data
@@ -80,3 +91,4 @@ jobs:
           set -e
           source venv/bin/activate
           dvc pull -v
+
