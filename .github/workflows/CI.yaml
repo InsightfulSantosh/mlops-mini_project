@@ -1,0 +1,73 @@
+name: CI Pipeline
+
+on: push
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────
+  # 🛠️ Job 1: Setup Environment (Shared Dependency)
+  # ───────────────────────────────────────────────────────────────────────
+  setup-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      python-cache-key: ${{ steps.cache-pip.outputs.cache-key }}
+      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
+    env:
+      VENV_PATH: venv/bin/activate
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required for full DVC commit history
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip dependencies
+        id: cache-pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache virtual environment
+        id: cache-venv
+        uses: actions/cache@v3
+        with:
+          path: venv
+          key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            venv-${{ runner.os }}-
+
+      - name: Create & Activate Virtual Environment
+        run: |
+          if [ ! -d "venv" ]; then
+            python -m venv venv
+            echo "✅ Virtual environment created"
+          else
+            echo "✅ Using cached virtual environment"
+          fi
+          source $VENV_PATH
+
+      - name: Install Dependencies
+        run: |
+          source $VENV_PATH
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install dvc[s3] dagshub mlflow
+
+      - name: Configure DVC & MLflow
+        env:
+          DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
+          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          source $VENV_PATH
+          echo "🔧 Configuring DVC and MLflow..."
+          dvc remote modify origin --local auth basic || echo "DVC auth already set"
+          dvc remote modify origin --local user $DAGSHUB_USER || echo "DVC user already set"
+          dvc remote modify origin --local password $DAGSHUB_TOKEN || echo "DVC password already set"
