@@ -4,70 +4,127 @@ on: push
 
 jobs:
   # ───────────────────────────────────────────────────────────────────────
-  # 🛠️ Job 1: Setup Environment (Shared Dependency)
+  # 🛠️ Job 1: Setup Environment
   # ───────────────────────────────────────────────────────────────────────
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      python-cache-key: ${{ steps.cache-pip.outputs.cache-key }}
       venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
-    env:
-      VENV_PATH: venv/bin/activate
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Required for full DVC commit history
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Cache pip dependencies
-        id: cache-pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Cache virtual environment
+      - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
         with:
           path: venv
           key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            venv-${{ runner.os }}-
-
-      - name: Create & Activate Virtual Environment
-        run: |
-          if [ ! -d "venv" ]; then
-            python -m venv venv
-            echo "✅ Virtual environment created"
-          else
-            echo "✅ Using cached virtual environment"
-          fi
-          source $VENV_PATH
 
       - name: Install Dependencies
         run: |
-          source $VENV_PATH
-          pip install --upgrade pip
+          set -e  # Stop execution on error
+          python -m venv venv
+          source venv/bin/activate
           pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow
+          pip install dvc[s3] dagshub mlflow boto3
 
-      - name: Configure DVC & MLflow
-        env:
-          DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
-          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+  # ───────────────────────────────────────────────────────────────────────
+  # 📥 Job 2: Configure DVC & Pull Data
+  # ───────────────────────────────────────────────────────────────────────
+  name: CI Pipeline
+
+on: push
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────
+  # 🛠️ Job 1: Setup Environment
+  # ───────────────────────────────────────────────────────────────────────
+  setup-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Cache Virtual Environment
+        id: cache-venv
+        uses: actions/cache@v3
+        with:
+          path: venv
+          key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Dependencies
+        run: |
+          set -e  # Stop execution on error
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install dvc[s3] dagshub mlflow boto3
+
+  # ───────────────────────────────────────────────────────────────────────
+  # 📥 Job 2: Configure DVC & Pull Data
+  # ───────────────────────────────────────────────────────────────────────
+  pull-dvc-data:
+    runs-on: ubuntu-latest
+    needs: setup-environment
+    if: success()
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Dynamically set AWS region
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore Virtual Environment
+        uses: actions/cache@v3
+        with:
+          path: venv
+          key: ${{ needs.setup-environment.outputs.venv-cache-key }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+
+      - name: Configure DVC S3 Remote
         run: |
-          source $VENV_PATH
-          echo "🔧 Configuring DVC and MLflow..."
-          dvc remote modify origin --local auth basic || echo "DVC auth already set"
-          dvc remote modify origin --local user $DAGSHUB_USER || echo "DVC user already set"
-          dvc remote modify origin --local password $DAGSHUB_TOKEN || echo "DVC password already set"
+          set -e
+          source venv/bin/activate
+          dvc remote list || true  
+
+          if ! dvc remote list | grep -q "origin"; then
+            dvc remote add origin s3://your-dvc-bucket/path
+            dvc remote modify origin endpointurl https://s3.${{ env.AWS_REGION }}.amazonaws.com
+            dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          fi
+
+          dvc remote default origin
+
+      - name: Pull DVC Data
+        run: |
+          set -e
+          source venv/bin/activate
+          dvc pull -v
+
+
+
+  
+
+
+
+
+   
