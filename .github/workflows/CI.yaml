@@ -16,6 +16,11 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Verify Python Installation
+        run: |
+          which python
+          python --version
+
       - name: Cache Virtual Environment
         id: cache-myenv
         uses: actions/cache@v3
@@ -25,9 +30,13 @@ jobs:
           restore-keys: |
             myenv-${{ runner.os }}-
 
+      - name: Create Virtual Environment
+        run: |
+          python -m venv myenv || echo "⚠️ Virtual environment creation failed!"
+          ls -la myenv  # Debugging step to check if `myenv` exists
+
       - name: Install Dependencies
         run: |
-          python -m venv myenv
           myenv/bin/python -m pip install --upgrade pip
           myenv/bin/python -m pip install -r requirements.txt
           myenv/bin/python -m pip install dvc[s3] boto3
@@ -46,8 +55,10 @@ jobs:
           path: myenv
           key: ${{ needs.setup-environment.outputs.venv-cache-key }}
 
-      - name: Check DVC Installation
-        run: myenv/bin/dvc --version  # Debugging step
+      - name: Verify Virtual Environment
+        run: |
+          ls -la myenv  # Debugging step
+          myenv/bin/python --version
 
       - name: Configure AWS for DVC
         env:
