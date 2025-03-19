@@ -1,0 +1,7 @@
+2025-03-19 07:25:32,967 - Model building - INFO - Process started to load the data
+2025-03-19 07:25:33,116 - Model building - DEBUG - Train_df loaded from ./data/processed/train_bow.csv
+2025-03-19 07:25:33,126 - Model building - INFO - Data loaded successfully
+2025-03-19 07:25:33,127 - Model building - DEBUG - X_train shape: (7780, 1000)
+2025-03-19 07:25:33,127 - Model building - INFO - Training model with Decision Tree Classifier
+2025-03-19 07:25:33,271 - Model building - DEBUG - Model training completed successfully
+2025-03-19 07:25:33,272 - Model building - INFO - Model saved at models/model.pkl
