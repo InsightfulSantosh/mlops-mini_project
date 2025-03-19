@@ -6,7 +6,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
+      venv-cache-key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -25,21 +25,14 @@ jobs:
           restore-keys: |
             myenv-${{ runner.os }}-
 
-      - name: Check if Virtual Environment Exists
-        id: check-venv
-        run: |
-          if [ -f "myenv/bin/activate" ]; then
-            echo "✅ Virtual environment found in cache."
-            echo "exists=true" >> $GITHUB_ENV
-          else
-            echo "⚠️ Virtual environment not found. Will create a new one."
-            echo "exists=false" >> $GITHUB_ENV
-          fi
-
       - name: Create & Install Dependencies in Virtual Environment
-        if: env.exists == 'false'
         run: |
-          python -m venv myenv
+          if [ ! -d "myenv" ]; then
+            python -m venv myenv
+            echo "✅ Virtual environment created"
+          else
+            echo "✅ Using cached virtual environment"
+          fi
           source myenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
@@ -57,12 +50,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: myenv
-          key: ${{ needs.setup-environment.outputs.venv-cache-key }}
+          key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            myenv-${{ runner.os }}-
+
+      - name: Ensure Virtual Environment Exists
+        run: |
+          if [ ! -f "myenv/bin/activate" ]; then
+            echo "❌ Virtual environment missing! Creating a new one."
+            python -m venv myenv
+          fi
 
       - name: Activate Virtual Environment & Check DVC
         run: |
           source myenv/bin/activate
-          which dvc  # Debugging step to confirm DVC installation
+          which dvc || echo "❌ DVC Not Found!"
 
       - name: Configure AWS for DVC
         env:
