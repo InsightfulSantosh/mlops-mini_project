@@ -74,7 +74,7 @@ def save_model(model, model_dir):
 def main():
     try:
         # Load data
-        train_path = "/Users/santoshkumar/Data_science/dvc-pipeline-tweet/data/processed/train_bow.csv"
+        train_path = "./data/processed/train_bow.csv"
         train_df = load_data(train_path)
         
         # Split data    
