@@ -22,17 +22,17 @@ jobs:
         with:
           path: venv
           key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: venv-${{ runner.os }}-
+          restore-keys: |
+            venv-${{ runner.os }}-
 
       - name: Install Dependencies
         run: |
-          if [ ! -d "venv" ]; then
-            python -m venv venv
-          fi
+          python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[s3] boto3
+          which dvc  # Debugging step
 
   pull-dvc-data:
     runs-on: ubuntu-latest
@@ -46,6 +46,11 @@ jobs:
         with:
           path: venv
           key: ${{ needs.setup-environment.outputs.venv-cache-key }}
+
+      - name: Activate Virtual Environment & Check DVC
+        run: |
+          source venv/bin/activate
+          which dvc  # Debugging step to confirm DVC installation
 
       - name: Configure AWS for DVC
         env:
