@@ -18,13 +18,13 @@ jobs:
 
       - name: Compute Cache Key
         id: set-cache-key
-        run: echo "venv_key=myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')" >> $GITHUB_ENV
+        run: echo "venv_key=myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}" >> $GITHUB_ENV
 
       - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
         with:
-          path: myenv
+          path: ${{ github.workspace }}/myenv
           key: ${{ env.venv_key }}
           restore-keys: |
             myenv-${{ runner.os }}-
@@ -60,7 +60,7 @@ jobs:
       - name: Restore Virtual Environment
         uses: actions/cache@v3
         with:
-          path: myenv
+          path: ${{ github.workspace }}/myenv
           key: ${{ needs.setup-environment.outputs.venv-cache-key }}
           restore-keys: |
             myenv-${{ runner.os }}-
