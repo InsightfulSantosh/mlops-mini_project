@@ -6,7 +6,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: ${{ steps.set-cache-key.outputs.key }}
+      venv-cache-key: ${{ steps.set-cache-key.outputs.venv_key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -18,14 +18,14 @@ jobs:
 
       - name: Compute Cache Key
         id: set-cache-key
-        run: echo "::set-output name=key::myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')"
+        run: echo "venv_key=myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')" >> $GITHUB_ENV
 
       - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
         with:
           path: myenv
-          key: ${{ steps.set-cache-key.outputs.key }}
+          key: ${{ env.venv_key }}
           restore-keys: |
             myenv-${{ runner.os }}-
 
@@ -79,7 +79,6 @@ jobs:
             echo "❌ DVC Not Found! Reinstalling..."
             pip install --upgrade pip
             pip install -r requirements.txt
-            pip install dvc[dvc-s3]
             pip install dvc[s3] boto3
           fi
           which dvc || exit 1  # Fail workflow if DVC is still not found
@@ -91,11 +90,9 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           source myenv/bin/activate
-          aws configure
-
-          dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
-          dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
-          dvc remote modify origin region $AWS_REGION
+          dvc remote modify origin --local access_key_id "${AWS_ACCESS_KEY_ID}"
+          dvc remote modify origin --local secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+          dvc remote modify origin --local region "${AWS_REGION}"
 
       - name: Pull DVC Data
         run: |
