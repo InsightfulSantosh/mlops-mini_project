@@ -6,7 +6,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+      venv-cache-key: ${{ steps.set-cache-key.outputs.key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -16,12 +16,16 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Compute Cache Key
+        id: set-cache-key
+        run: echo "key=myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')" >> $GITHUB_ENV
+
       - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
         with:
           path: myenv
-          key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ env.key }}
           restore-keys: |
             myenv-${{ runner.os }}-
 
@@ -50,7 +54,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: myenv
-          key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ needs.setup-environment.outputs.venv-cache-key }}
           restore-keys: |
             myenv-${{ runner.os }}-
 
