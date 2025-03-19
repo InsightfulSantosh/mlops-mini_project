@@ -83,16 +83,34 @@ jobs:
           fi
           which dvc || exit 1  # Fail workflow if DVC is still not found
 
-      - name: Configure AWS for DVC
+      - name: Configure AWS
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           source myenv/bin/activate
-          dvc remote modify origin --local access_key_id "${AWS_ACCESS_KEY_ID}"
-          dvc remote modify origin --local secret_access_key "${AWS_SECRET_ACCESS_KEY}"
-          dvc remote modify origin --local region "${AWS_REGION}"
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+          aws configure set region "$AWS_REGION"
+
+      - name: Initialize Git and DVC
+        run: |
+          source myenv/bin/activate
+          git init
+          dvc init
+          git commit -m "Initialize DVC"
+
+      - name: Set up S3 remote for DVC
+        env:
+          AWS_BUCKET_NAME: "emmy-database"
+          AWS_REGION: "eu-north-1"
+        run: |
+          source myenv/bin/activate
+          dvc remote add s3remote s3://$AWS_BUCKET_NAME/dvcstore
+          dvc remote modify s3remote region $AWS_REGION
+          dvc remote default s3remote
+          dvc remote list
 
       - name: Pull DVC Data
         run: |
