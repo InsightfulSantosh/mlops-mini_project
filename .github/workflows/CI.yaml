@@ -40,7 +40,7 @@ jobs:
 
       - name: Pull DVC Data  
         run: |
-          dvc pull -v || echo "⚠️ DVC Pull Failed, continuing..."
+          dvc pull -v || echo "⚠️ DVC local Pull Failed, continuing..."
           ls -lah data/processed/  # Debugging: Check if files exist
 
       - name: Run Pipeline
