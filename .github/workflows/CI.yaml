@@ -18,18 +18,18 @@ jobs:
 
       - name: Compute Cache Key
         id: set-cache-key
-        run: echo "key=myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')" >> $GITHUB_ENV
+        run: echo "::set-output name=key::myenv-${{ runner.os }}-$(sha256sum requirements.txt | awk '{print $1}')"
 
       - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
         with:
           path: myenv
-          key: ${{ env.key }}
+          key: ${{ steps.set-cache-key.outputs.key }}
           restore-keys: |
             myenv-${{ runner.os }}-
 
-      - name: Create & Install Dependencies in Virtual Environment
+      - name: Create Virtual Environment if Not Cached
         run: |
           if [ ! -d "myenv" ]; then
             python -m venv myenv
@@ -37,11 +37,18 @@ jobs:
           else
             echo "✅ Using cached virtual environment"
           fi
+
+      - name: Install Dependencies (Ensure DVC is Installed)
+        run: |
           source myenv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install dvc[s3] boto3
-          which dvc  # Debugging step
+          if ! command -v dvc &> /dev/null; then
+            echo "🚀 Installing dependencies..."
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install dvc[s3] boto3
+          else
+            echo "✅ DVC already installed."
+          fi
 
   pull-dvc-data:
     runs-on: ubuntu-latest
@@ -65,10 +72,16 @@ jobs:
             python -m venv myenv
           fi
 
-      - name: Activate Virtual Environment & Check DVC
+      - name: Activate Virtual Environment & Verify DVC
         run: |
           source myenv/bin/activate
-          which dvc || echo "❌ DVC Not Found!"
+          if ! command -v dvc &> /dev/null; then
+            echo "❌ DVC Not Found! Reinstalling..."
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install dvc[s3] boto3
+          fi
+          which dvc || exit 1  # Fail workflow if DVC is still not found
 
       - name: Configure AWS for DVC
         env:
