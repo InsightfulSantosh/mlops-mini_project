@@ -79,6 +79,7 @@ jobs:
             echo "❌ DVC Not Found! Reinstalling..."
             pip install --upgrade pip
             pip install -r requirements.txt
+            pip install dvc[dvc-s3]
             pip install dvc[s3] boto3
           fi
           which dvc || exit 1  # Fail workflow if DVC is still not found
@@ -90,6 +91,8 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           source myenv/bin/activate
+          aws configure
+
           dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
           dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
           dvc remote modify origin region $AWS_REGION
