@@ -6,7 +6,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: ${{ steps.cache-myenv.outputs.cache-key }}
+      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -17,7 +17,7 @@ jobs:
           python-version: '3.10'
 
       - name: Cache Virtual Environment
-        id: cache-myenv
+        id: cache-venv
         uses: actions/cache@v3
         with:
           path: myenv
@@ -34,20 +34,17 @@ jobs:
           else
             echo "⚠️ Virtual environment not found. Will create a new one."
             echo "exists=false" >> $GITHUB_ENV
+          fi
 
-      - name: Create Virtual Environment (if not cached)
+      - name: Create & Install Dependencies in Virtual Environment
         if: env.exists == 'false'
         run: |
-          python3 -m venv myenv
-          echo "✅ Virtual environment created."
-
-      - name: Activate Virtual Environment & Install Dependencies
-        run: |
+          python -m venv myenv
           source myenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[s3] boto3
-          dvc --version || echo "❌ DVC installation failed!"
+          which dvc  # Debugging step
 
   pull-dvc-data:
     runs-on: ubuntu-latest
@@ -62,20 +59,23 @@ jobs:
           path: myenv
           key: ${{ needs.setup-environment.outputs.venv-cache-key }}
 
-      - name: Activate Virtual Environment & Configure AWS
+      - name: Activate Virtual Environment & Check DVC
         run: |
           source myenv/bin/activate
-          echo "🔧 Configuring AWS credentials for DVC..."
-          dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
-          dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
-          dvc remote modify origin region $AWS_REGION
+          which dvc  # Debugging step to confirm DVC installation
 
-      - name: Pull Data with DVC
+      - name: Configure AWS for DVC
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           source myenv/bin/activate
-          echo "📥 Running DVC pull..."
+          dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
+          dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
+          dvc remote modify origin region $AWS_REGION
+
+      - name: Pull DVC Data
+        run: |
+          source myenv/bin/activate
           dvc pull -v || echo "⚠️ DVC Pull Failed, continuing..."
