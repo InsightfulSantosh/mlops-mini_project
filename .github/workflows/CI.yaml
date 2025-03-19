@@ -50,7 +50,7 @@ jobs:
       - name : DVC push
         run: |
           dvc push
-
+          
       - name: Push DVC Changes to GitHub
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -60,9 +60,13 @@ jobs:
 
           git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/InsightfulSantosh/mlops-mini_project.git
 
+          # Ensure the latest changes are pulled
+          git pull origin main --rebase || echo "No changes to pull"
+
           git add .
           git commit -m "Updated DVC files [skip ci]" || echo "No changes to commit"
           git push origin main || echo "No changes to push"
+
 
 
 
