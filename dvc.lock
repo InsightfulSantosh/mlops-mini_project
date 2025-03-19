@@ -57,7 +57,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: a1cb67aa4db2b3c355b77cd9a1bba524
+      md5: 38a36fd338f9f57ffad8e255d6635110
       size: 27608
   model_building:
     cmd: python src/model/model_building.py
