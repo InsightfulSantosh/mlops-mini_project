@@ -1,8 +1,8 @@
-2025-03-19 07:25:31,331 - feature_engineering - INFO - Starting feature engineering process.
-2025-03-19 07:25:31,331 - feature_engineering - DEBUG - Parameters retrieved from params.yaml
-2025-03-19 07:25:31,337 - feature_engineering - DEBUG - Data loaded successfully from data/interim/train_processed.csv
-2025-03-19 07:25:31,339 - feature_engineering - DEBUG - Data loaded successfully from data/interim/test_processed.csv
-2025-03-19 07:25:31,402 - feature_engineering - DEBUG - Vectorizer saved successfully to models/vectorizer.pkl
-2025-03-19 07:25:31,402 - feature_engineering - INFO - Bag-of-Words transformation completed successfully.
-2025-03-19 07:25:31,990 - feature_engineering - DEBUG - Data saved successfully to data/processed/train_bow.csv
-2025-03-19 07:25:32,190 - feature_engineering - DEBUG - Data saved successfully to data/processed/test_bow.csv
+2025-03-19 08:41:33,127 - feature_engineering - INFO - Starting feature engineering process.
+2025-03-19 08:41:33,128 - feature_engineering - DEBUG - Parameters retrieved from params.yaml
+2025-03-19 08:41:33,137 - feature_engineering - DEBUG - Data loaded successfully from data/interim/train_processed.csv
+2025-03-19 08:41:33,139 - feature_engineering - DEBUG - Data loaded successfully from data/interim/test_processed.csv
+2025-03-19 08:41:33,231 - feature_engineering - DEBUG - Vectorizer saved successfully to models/vectorizer.pkl
+2025-03-19 08:41:33,231 - feature_engineering - INFO - Bag-of-Words transformation completed successfully.
+2025-03-19 08:41:33,811 - feature_engineering - DEBUG - Data saved successfully to data/processed/train_bow.csv
+2025-03-19 08:41:33,876 - feature_engineering - DEBUG - Data saved successfully to data/processed/test_bow.csv
