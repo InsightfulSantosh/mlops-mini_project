@@ -6,7 +6,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     outputs:
-      venv-cache-key: ${{ steps.cache-venv.outputs.cache-key }}
+      venv-cache-key: ${{ steps.cache-myenv.outputs.cache-key }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -17,22 +17,21 @@ jobs:
           python-version: '3.10'
 
       - name: Cache Virtual Environment
-        id: cache-venv
+        id: cache-myenv
         uses: actions/cache@v3
         with:
-          path: venv
-          key: venv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          path: myenv
+          key: myenv-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
           restore-keys: |
-            venv-${{ runner.os }}-
+            myenv-${{ runner.os }}-
 
       - name: Install Dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install dvc[s3] boto3
-          which dvc  # Debugging step
+          python -m venv myenv
+          myenv/bin/python -m pip install --upgrade pip
+          myenv/bin/python -m pip install -r requirements.txt
+          myenv/bin/python -m pip install dvc[s3] boto3
+          myenv/bin/dvc --version  # Debugging step
 
   pull-dvc-data:
     runs-on: ubuntu-latest
@@ -44,13 +43,11 @@ jobs:
       - name: Restore Virtual Environment
         uses: actions/cache@v3
         with:
-          path: venv
+          path: myenv
           key: ${{ needs.setup-environment.outputs.venv-cache-key }}
 
-      - name: Activate Virtual Environment & Check DVC
-        run: |
-          source venv/bin/activate
-          which dvc  # Debugging step to confirm DVC installation
+      - name: Check DVC Installation
+        run: myenv/bin/dvc --version  # Debugging step
 
       - name: Configure AWS for DVC
         env:
@@ -58,12 +55,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          source venv/bin/activate
-          dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
-          dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
-          dvc remote modify origin region $AWS_REGION
+          myenv/bin/dvc remote modify origin access_key_id $AWS_ACCESS_KEY_ID
+          myenv/bin/dvc remote modify origin secret_access_key $AWS_SECRET_ACCESS_KEY
+          myenv/bin/dvc remote modify origin region $AWS_REGION
 
       - name: Pull DVC Data
-        run: |
-          source venv/bin/activate
-          dvc pull -v || echo "⚠️ DVC Pull Failed, continuing..."
+        run: myenv/bin/dvc pull -v || echo "⚠️ DVC Pull Failed, continuing..."
