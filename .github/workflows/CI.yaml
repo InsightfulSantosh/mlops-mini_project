@@ -51,3 +51,9 @@ jobs:
         run: |
           dvc push
 
+      - name : git add 
+        run: |
+          git add . 
+          git commit -m 'pushed through CI' 
+          git push origin main
+
