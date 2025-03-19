@@ -50,7 +50,7 @@ jobs:
       - name : DVC push
         run: |
           dvc push
-          
+
       - name: Push DVC Changes to GitHub
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -58,9 +58,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Set the remote URL using the token for authentication
           git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/InsightfulSantosh/mlops-mini_project.git
 
-          # Ensure the latest changes are pulled
+          # Ensure the latest changes are pulled before pushing
           git pull origin main --rebase || echo "No changes to pull"
 
           git add .
