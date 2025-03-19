@@ -1,23 +1,23 @@
-2025-03-19 08:41:29,667 - INFO - 🚀 Starting the data cleaning process.
-2025-03-19 08:41:29,667 - DEBUG - 🔍 Ensuring necessary directories exist.
-2025-03-19 08:41:29,667 - DEBUG - Created directory: /Users/santoshkumar/Data_science/mlops-mini_project/data/interim
-2025-03-19 08:41:29,667 - INFO - 📥 Loading training data from: data/raw/train/train.csv
-2025-03-19 08:41:29,667 - INFO - 📥 Loading testing data from: data/raw/test/test.csv
-2025-03-19 08:41:29,682 - INFO - ✅ Data successfully loaded.
-2025-03-19 08:41:29,682 - DEBUG - 🧼 Starting data normalization.
-2025-03-19 08:41:29,682 - DEBUG - Starting the data preprocessing pipeline.
-2025-03-19 08:41:29,812 - DEBUG - Data cleaning completed successfully.
-2025-03-19 08:41:29,829 - DEBUG - Removed short words (length < 3) successfully.
-2025-03-19 08:41:31,775 - DEBUG - Lemmatization completed successfully.
-2025-03-19 08:41:31,793 - DEBUG - Stopwords removed successfully.
-2025-03-19 08:41:31,793 - DEBUG - Text preprocessing completed successfully.
-2025-03-19 08:41:31,793 - DEBUG - Starting the data preprocessing pipeline.
-2025-03-19 08:41:31,808 - DEBUG - Data cleaning completed successfully.
-2025-03-19 08:41:31,810 - DEBUG - Removed short words (length < 3) successfully.
-2025-03-19 08:41:31,838 - DEBUG - Lemmatization completed successfully.
-2025-03-19 08:41:31,840 - DEBUG - Stopwords removed successfully.
-2025-03-19 08:41:31,840 - DEBUG - Text preprocessing completed successfully.
-2025-03-19 08:41:31,840 - INFO - ✅ Data normalization completed.
-2025-03-19 08:41:31,840 - INFO - 💾 Saving processed training data to: ./data/interim/train_processed.csv
-2025-03-19 08:41:31,852 - INFO - 💾 Saving processed testing data to: ./data/interim/test_processed.csv
-2025-03-19 08:41:31,854 - INFO - 🎉 Data cleaning process completed successfully!
+2025-03-19 08:48:59,905 - INFO - 🚀 Starting the data cleaning process.
+2025-03-19 08:48:59,905 - DEBUG - 🔍 Ensuring necessary directories exist.
+2025-03-19 08:48:59,905 - DEBUG - Created directory: /Users/santoshkumar/Data_science/mlops-mini_project/data/interim
+2025-03-19 08:48:59,905 - INFO - 📥 Loading training data from: data/raw/train/train.csv
+2025-03-19 08:48:59,905 - INFO - 📥 Loading testing data from: data/raw/test/test.csv
+2025-03-19 08:48:59,920 - INFO - ✅ Data successfully loaded.
+2025-03-19 08:48:59,920 - DEBUG - 🧼 Starting data normalization.
+2025-03-19 08:48:59,920 - DEBUG - Starting the data preprocessing pipeline.
+2025-03-19 08:49:00,050 - DEBUG - Data cleaning completed successfully.
+2025-03-19 08:49:00,067 - DEBUG - Removed short words (length < 3) successfully.
+2025-03-19 08:49:02,094 - DEBUG - Lemmatization completed successfully.
+2025-03-19 08:49:02,113 - DEBUG - Stopwords removed successfully.
+2025-03-19 08:49:02,113 - DEBUG - Text preprocessing completed successfully.
+2025-03-19 08:49:02,113 - DEBUG - Starting the data preprocessing pipeline.
+2025-03-19 08:49:02,128 - DEBUG - Data cleaning completed successfully.
+2025-03-19 08:49:02,131 - DEBUG - Removed short words (length < 3) successfully.
+2025-03-19 08:49:02,159 - DEBUG - Lemmatization completed successfully.
+2025-03-19 08:49:02,162 - DEBUG - Stopwords removed successfully.
+2025-03-19 08:49:02,162 - DEBUG - Text preprocessing completed successfully.
+2025-03-19 08:49:02,162 - INFO - ✅ Data normalization completed.
+2025-03-19 08:49:02,162 - INFO - 💾 Saving processed training data to: ./data/interim/train_processed.csv
+2025-03-19 08:49:02,175 - INFO - 💾 Saving processed testing data to: ./data/interim/test_processed.csv
+2025-03-19 08:49:02,177 - INFO - 🎉 Data cleaning process completed successfully!

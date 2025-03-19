@@ -1,7 +1,7 @@
-2025-03-19 08:41:35,125 - Model building - INFO - Process started to load the data
-2025-03-19 08:41:35,271 - Model building - DEBUG - Train_df loaded from ./data/processed/train_bow.csv
-2025-03-19 08:41:35,280 - Model building - INFO - Data loaded successfully
-2025-03-19 08:41:35,280 - Model building - DEBUG - X_train shape: (9336, 500)
-2025-03-19 08:41:35,280 - Model building - INFO - Training model with Decision Tree Classifier
-2025-03-19 08:41:35,474 - Model building - DEBUG - Model training completed successfully
-2025-03-19 08:41:35,475 - Model building - INFO - Model saved at models/model.pkl
+2025-03-19 08:49:06,921 - Model building - INFO - Process started to load the data
+2025-03-19 08:49:07,431 - Model building - DEBUG - Train_df loaded from ./data/processed/train_bow.csv
+2025-03-19 08:49:07,457 - Model building - INFO - Data loaded successfully
+2025-03-19 08:49:07,457 - Model building - DEBUG - X_train shape: (9336, 1500)
+2025-03-19 08:49:07,457 - Model building - INFO - Training model with Decision Tree Classifier
+2025-03-19 08:49:07,993 - Model building - DEBUG - Model training completed successfully
+2025-03-19 08:49:07,994 - Model building - INFO - Model saved at models/model.pkl
