@@ -1,8 +1,0 @@
-2025-03-20 06:16:12,770 - feature_engineering - INFO - Starting feature engineering process.
-2025-03-20 06:16:12,771 - feature_engineering - DEBUG - Parameters retrieved from params.yaml
-2025-03-20 06:16:12,777 - feature_engineering - DEBUG - Data loaded successfully from data/interim/train_processed.csv
-2025-03-20 06:16:12,778 - feature_engineering - DEBUG - Data loaded successfully from data/interim/test_processed.csv
-2025-03-20 06:16:12,840 - feature_engineering - DEBUG - Vectorizer saved successfully to models/vectorizer.pkl
-2025-03-20 06:16:12,840 - feature_engineering - INFO - Bag-of-Words transformation completed successfully.
-2025-03-20 06:16:13,565 - feature_engineering - DEBUG - Data saved successfully to data/processed/train_bow.csv
-2025-03-20 06:16:13,643 - feature_engineering - DEBUG - Data saved successfully to data/processed/test_bow.csv

@@ -89,5 +89,7 @@ target/
 /data
 /models
 
-/pipeline_logs/
-/reports/
+pipeline_logs/
+reports/
+/pipeline_logs
+/reports
