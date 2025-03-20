@@ -44,6 +44,9 @@ jobs:
           ls -lah data/processed/  # Debugging: Check if files exist
 
       - name: Run Pipeline
+        env:           
+          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+
         run: |
           dvc repro
 

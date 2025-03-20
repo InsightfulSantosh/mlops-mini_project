@@ -57,7 +57,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: d6c3743434c0612f2f41d47df056f3bf
+      md5: 6e6c6a542af2f71f6223005824724add
       size: 55282
   model_building:
     cmd: python src/model/model_building.py
@@ -85,12 +85,12 @@ stages:
       size: 30034
     - path: src/model/model_evaluation.py
       hash: md5
-      md5: cb29e0319e1de43be0682065ac4bb68f
-      size: 5683
+      md5: df17cec3d73329bf39dca3f2e1852218
+      size: 5980
     outs:
     - path: pipeline-logs
       hash: md5
-      md5: 3faf43e1c4538aabbf77ec7cf674115a.dir
+      md5: 33a16d67174aeef55cdf04546c16d7d0.dir
       size: 6253
       nfiles: 5
     - path: reports/metrics.json
@@ -99,5 +99,5 @@ stages:
       size: 180
     - path: reports/model_info.json
       hash: md5
-      md5: 2290a847964f967e258bb5bf9b4f6da0
+      md5: 40dabf944f1ced59e5c13b1c89d6d298
       size: 79

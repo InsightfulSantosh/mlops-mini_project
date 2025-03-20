@@ -4,3 +4,5 @@
 ['remote "myremote"']
     url = s3://emmy-database
     region = eu-north-1
+['remote "origin"']
+    url = https://dagshub.com/InsightfulSantosh/mlops-mini_project.dvc
