@@ -78,8 +78,8 @@ def main():
         train_df = load_data(train_path)
         
         # Split data    
-        X_train = train_df.drop('label', axis=1)
-        y_train = train_df['label']
+        X_train = train_df.iloc[:, :-1].values
+        y_train = train_df.iloc[:, -1].values
 
         logger.info('Data loaded successfully')
         logger.debug("X_train shape: %s", X_train.shape)

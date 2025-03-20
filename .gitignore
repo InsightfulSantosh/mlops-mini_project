@@ -88,3 +88,6 @@ target/
 .mypy_cache/
 /data
 /models
+
+/pipeline_logs/
+/reports/
