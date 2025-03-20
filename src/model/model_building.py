@@ -11,10 +11,15 @@ logger.setLevel(logging.DEBUG)
 if logger.hasHandlers():
     logger.handlers.clear()
 
-log_file_path = "pipeline-logs/4.model_building.log"
+# Define the log file path
+os.makedirs("pipeline-logs", exist_ok=True)
 
+log_file_path = "pipeline-logs/4.model_buildeing.log"
+
+# Delete the log file if it exists
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
+    logger.debug(f"Previous log file '{log_file_path}' deleted.")
 
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)

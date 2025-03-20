@@ -44,4 +44,7 @@ stages:
     metrics:
     - reports/metrics.json
     outs:
-    - reports/model_info.json  # Add the model_info.json file as an output
+    - reports/model_info.json
+    - pipeline-logs:
+        persist: true  # Correct YAML indentation
+

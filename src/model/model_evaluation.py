@@ -21,7 +21,11 @@ logger.setLevel(logging.DEBUG)
 if logger.hasHandlers():
     logger.handlers.clear()
 
+# Define the log file path
+os.makedirs("pipeline-logs", exist_ok=True)
 log_file_path = "pipeline-logs/5.model_evaluation.log"
+
+# Delete the log file if it exists
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
 
@@ -147,7 +151,7 @@ def main():
             mlflow.log_artifact('reports/model_info.json')
 
             # Log the logging  file to MLflow
-            mlflow.log_artifacts('./pipeline_logs')
+            mlflow.log_artifacts('./pipeline-logs')
             
             logger.info("Model evaluation pipeline completed successfully.")
         except Exception as e:
