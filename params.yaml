@@ -3,4 +3,4 @@ data_ingestion:
   test_size: 0.10
 
 feature_engineering:
-  max_features: 1500
+  max_features: 1000
