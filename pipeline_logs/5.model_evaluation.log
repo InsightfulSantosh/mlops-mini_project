@@ -1,0 +1,19 @@
+2025-03-20 09:13:30,813 - model_evaluation - INFO - Starting model evaluation pipeline...
+2025-03-20 09:13:30,813 - model_evaluation - INFO - Loading model from ./models/model.pkl
+2025-03-20 09:13:30,926 - model_evaluation - INFO - Model loaded successfully: DecisionTreeClassifier(criterion='entropy', max_depth=15, random_state=42)
+2025-03-20 09:13:30,926 - model_evaluation - INFO - Loading data from ./data/processed/test_bow.csv
+2025-03-20 09:13:30,960 - model_evaluation - INFO - Data loaded successfully, shape: (1038, 1001)
+2025-03-20 09:13:30,960 - model_evaluation - INFO - Loading data from ./data/raw/test/test.csv
+2025-03-20 09:13:30,962 - model_evaluation - INFO - Data loaded successfully, shape: (1038, 2)
+2025-03-20 09:13:30,962 - model_evaluation - INFO - Starting model evaluation...
+2025-03-20 09:13:30,969 - model_evaluation - INFO - Evaluation metrics:
+2025-03-20 09:13:30,969 - model_evaluation - INFO - {
+    "accuracy": 0.630057803468208,
+    "recall": 0.3230174081237911,
+    "precision": 0.8308457711442786,
+    "f1_score": 0.46518105849582175,
+    "roc_auc": 0.7221605527237086
+}
+2025-03-20 09:13:30,970 - model_evaluation - DEBUG - Metrics saved to ./reports/metrics.json
+2025-03-20 09:13:51,134 - model_evaluation - DEBUG - Model info saved to reports/model_info.json
+2025-03-20 09:13:56,310 - model_evaluation - INFO - Model evaluation pipeline completed successfully.

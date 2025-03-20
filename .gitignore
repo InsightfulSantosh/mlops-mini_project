@@ -30,6 +30,8 @@ var/
 *.spec
 
 # Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
@@ -47,6 +49,7 @@ coverage.xml
 
 # Django stuff:
 
+
 # Sphinx documentation
 docs/_build/
 
@@ -55,6 +58,7 @@ target/
 
 # DotEnv configuration
 .env
+myenv/
 
 # Database
 *.db
@@ -74,8 +78,6 @@ target/
 
 # exclude data from source control by default
 /data/
-/models/
-
 
 # Mac OS-specific storage files
 .DS_Store
@@ -86,8 +88,6 @@ target/
 
 # Mypy cache
 .mypy_cache/
-/data
-/models
 
-/pipeline_logs/
-/reports/
+myenv
+models/
