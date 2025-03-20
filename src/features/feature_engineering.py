@@ -14,8 +14,8 @@ if logger.hasHandlers():
     logger.handlers.clear()
 
 # Define log file path
-os.makedirs("pipeline_logs", exist_ok=True)
-log_file_path = "pipeline_logs/3.feature_engineering.log"
+os.makedirs("pipeline-logs", exist_ok=True)
+log_file_path = "pipeline-logs/3.feature_engineering.log"
 
 # Delete the log file if it exists
 if os.path.exists(log_file_path):

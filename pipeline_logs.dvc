@@ -1,6 +1,0 @@
-outs:
-- md5: a14f79447878b2a7aa4fd48331c02114.dir
-  size: 6250
-  nfiles: 5
-  hash: md5
-  path: pipeline_logs

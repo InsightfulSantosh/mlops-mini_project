@@ -15,7 +15,7 @@ logger = logging.getLogger("data_cleaning")
 logger.setLevel(logging.DEBUG)
 
 # Path to the log file
-log_file_path = "pipeline_logs/2.data_cleaning.log"
+log_file_path = "pipeline-logs/2.data_cleaning.log"
 
 # Delete the previous log file if it exists
 if os.path.exists(log_file_path):

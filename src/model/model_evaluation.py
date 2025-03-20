@@ -21,7 +21,7 @@ logger.setLevel(logging.DEBUG)
 if logger.hasHandlers():
     logger.handlers.clear()
 
-log_file_path = "pipeline_logs/5.model_evaluation.log"
+log_file_path = "pipeline-logs/5.model_evaluation.log"
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
 

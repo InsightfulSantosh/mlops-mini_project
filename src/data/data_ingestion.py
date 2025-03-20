@@ -11,9 +11,9 @@ logger = logging.getLogger("data_ingestion")
 logger.setLevel(logging.DEBUG)
 
 # Define the log file path
-os.makedirs("pipeline_logs", exist_ok=True)
+os.makedirs("pipeline-logs", exist_ok=True)
 
-log_file_path = "pipeline_logs/1.data_ingestion.log"
+log_file_path = "pipeline-logs/1.data_ingestion.log"
 
 # Delete the log file if it exists
 if os.path.exists(log_file_path):
