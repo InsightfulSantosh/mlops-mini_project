@@ -93,3 +93,4 @@ pipeline_logs/
 reports/
 /pipeline_logs
 /reports
+myenv/
