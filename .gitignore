@@ -89,9 +89,9 @@ data/
 # Mypy cache
 .mypy_cache/
 
-pipeline-logs/
 
 /reports/
 /models/
 
 pipeline-logs
+/mlruns

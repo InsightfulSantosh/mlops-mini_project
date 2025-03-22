@@ -2,14 +2,15 @@ import numpy as np
 import pandas as pd
 import pickle
 import json
-from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score, f1_score
-from mlflow.models.signature import infer_signature
+import os
 import logging
 import mlflow
 import mlflow.sklearn
 import dagshub
-import os
-# Set up DagsHub credentials for MLflow tracking
+from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score, f1_score
+from mlflow.models.signature import infer_signature
+
+# ---------------------- SETUP DAGSHUB MLflow TRACKING ----------------------
 dagshub_token = os.getenv("DAGSHUB_PAT")
 if not dagshub_token:
     raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
@@ -18,21 +19,18 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub.init(repo_owner='InsightfulSantosh', repo_name='mlops-mini_project', mlflow=True)
-experiment_name = "tweet_emotion_classification"
-experiment = mlflow.get_experiment_by_name(experiment_name)
 
-# Set up logging
+# ---------------------- SETUP LOGGING ----------------------
 logger = logging.getLogger('model_evaluation')
 logger.setLevel(logging.DEBUG)
 
 if logger.hasHandlers():
     logger.handlers.clear()
 
-# Define the log file path
-os.makedirs("pipeline-logs", exist_ok=True)
-log_file_path = "pipeline-logs/5.model_evaluation.log"
+log_dir = "pipeline-logs"
+os.makedirs(log_dir, exist_ok=True)
+log_file_path = os.path.join(log_dir, "5.model_evaluation.log")
 
-# Delete the log file if it exists
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
 
@@ -41,6 +39,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -
 logger.addHandler(handler)
 logger.addHandler(logging.StreamHandler())
 
+# ---------------------- UTILITY FUNCTIONS ----------------------
 def load_model(file_path):
     """Loads the model from a pickle file."""
     try:
@@ -114,8 +113,9 @@ def save_model_info(run_id: str, model_path: str, file_path: str) -> None:
         logger.error('Error occurred while saving the model info: %s', e)
         raise
 
+# ---------------------- MAIN EXECUTION PIPELINE ----------------------
 def main():
-    mlflow.set_experiment("dvc-pipeline")
+    mlflow.set_experiment("baseline")
     with mlflow.start_run() as run:  # Start an MLflow run
         try:
             model_path = "./models/model.pkl"
@@ -144,25 +144,30 @@ def main():
                 for param_name, param_value in params.items():
                     mlflow.log_param(param_name, param_value)
             
+            # Log the model with signature and input example
+            input_example = x_test[:5]  # First 5 test samples
+            signature = infer_signature(x_test, model.predict(x_test))
             
-            # Log model to MLflow
-            mlflow.sklearn.log_model(model, "model")
-            
+            artifact_path = "model"
+            mlflow.sklearn.log_model(
+                model, artifact_path,
+                signature=signature,
+                input_example=input_example
+            )
+
             # Save model info
-            save_model_info(run.info.run_id, "model", 'reports/model_info.json')
-            
-            # Log the metrics file to MLflow
+            save_model_info(run.info.run_id, artifact_path, 'reports/model_info.json')
+
+            # Log artifacts (metrics, model info, logs)
             mlflow.log_artifact('reports/metrics.json')
-
-            # Log the model info file to MLflow
             mlflow.log_artifact('reports/model_info.json')
+            mlflow.log_artifacts(log_dir)
 
-            # Log the logging  file to MLflow
-            mlflow.log_artifacts('./pipeline-logs')
-            
-            logger.info("Model evaluation pipeline completed successfully.")
+            logger.info("✅ Model evaluation pipeline completed successfully.")
+            logger.info(f"🔗 View MLflow Run: {mlflow.get_tracking_uri()}/#/experiments/{run.info.experiment_id}/runs/{run.info.run_id}")
         except Exception as e:
-            logger.error(f"Pipeline execution failed: {str(e)}")
+            logger.error(f"❌ Pipeline execution failed: {str(e)}")
 
+# ---------------------- EXECUTE SCRIPT ----------------------
 if __name__ == '__main__':
     main()
