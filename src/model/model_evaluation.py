@@ -115,7 +115,7 @@ def save_model_info(run_id: str, model_path: str, file_path: str) -> None:
 
 # ---------------------- MAIN EXECUTION PIPELINE ----------------------
 def main():
-    mlflow.set_experiment("baseline")
+    mlflow.set_experiment("experiment:1")
     with mlflow.start_run() as run:  # Start an MLflow run
         try:
             model_path = "./models/model.pkl"

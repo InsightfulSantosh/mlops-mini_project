@@ -86,11 +86,11 @@ def model_registry(model_name, model_info):
         client.set_model_version_tag(model_name, result.version, "use_case", "NLP")
         client.set_model_version_tag(model_name, result.version, "version_notes", "Initial model deployment")
 
-
         # Assign alias to model version
         alias = "staging"  # Change to "staging", "testing", etc., as needed
         client.set_registered_model_alias(model_name, alias, result.version)
         logger.info(f"✅ Model '{model_name}' assigned alias '{alias}' (Version {result.version})")
+
 
     except Exception as e:
         logger.error(f"❌ Error during model registration: {str(e)}")
@@ -104,7 +104,7 @@ def main():
         logger.info("🚀 Starting model registry pipeline...")
 
         model_info = load_model_info(model_info_path)
-        model_name = "tweet_emotion_classifier"
+        model_name = "randomforest"
 
         model_registry(model_name, model_info)
         logger.info("✅ Model registry pipeline completed successfully.")

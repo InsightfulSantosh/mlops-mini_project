@@ -48,8 +48,8 @@ stages:
           persist: true  # Keeps logs even after `dvc repro`
 
   model_registry:
-     cmd : python src/model/model_evaluation.py
+     cmd : python src/model/model_registry.py
      deps : 
-      - reports/model_info.json
       - src/model/model_registry.py
+      - reports/model_info.json
       

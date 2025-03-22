@@ -52,7 +52,7 @@ def load_data(file_path):
 def train_model(X_train, y_train):
     try:
         logger.info("Training model with Decision Tree Classifier")
-        params = {'max_depth': 30, 'random_state': 42, 'criterion': 'entropy'}
+        params = {'max_depth': 50, 'random_state': 42, 'criterion': 'entropy'}
 
         model = DecisionTreeClassifier(**params)
         model.fit(X_train, y_train)
