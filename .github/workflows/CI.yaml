@@ -38,6 +38,9 @@ jobs:
           aws configure set region $AWS_REGION
           dvc remote list
 
+      - name: Set DAGSHUB_PAT Environment Variable
+        run: echo "DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
+
       - name: Pull DVC Data  
         run: |
           dvc pull -v || echo "⚠️ DVC local Pull Failed, continuing..."
@@ -46,22 +49,12 @@ jobs:
       - name: Run Pipeline
         env:           
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
-
         run: |
-          dvc repro -f
+          dvc repro
 
-      - name : DVC push
+      - name: DVC Push
         run: |
           dvc push
 
       - name: Check DVC Status
         run: dvc status
-
-
-
-  
-
-
-
-
-
