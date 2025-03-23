@@ -22,7 +22,12 @@ else:
 os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-dagshub.init(repo_owner='InsightfulSantosh', repo_name='mlops-mini_project', mlflow=True)
+dagshub_url = "https://dagshub.com"
+repo_owner = "InsightfulSantosh"
+repo_name = "mlops-mini_project"
+
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 # ---------------------- SETUP LOGGING ----------------------
 logger = logging.getLogger('model_evaluation')
