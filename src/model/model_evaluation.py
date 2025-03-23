@@ -11,9 +11,13 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_a
 from mlflow.models.signature import infer_signature
 
 # ---------------------- SETUP DAGSHUB MLflow TRACKING ----------------------
+
 dagshub_token = os.getenv("DAGSHUB_PAT")
 if not dagshub_token:
-    raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
+    raise EnvironmentError("❌ DAGSHUB_PAT environment variable is missing!")
+else:
+    print("✅ DAGSHUB_PAT is set correctly.")
+
 
 os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token

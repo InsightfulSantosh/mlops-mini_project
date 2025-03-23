@@ -41,10 +41,21 @@ jobs:
       - name: Set DAGSHUB_PAT Environment Variable
         run: echo "DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
 
+
       - name: Pull DVC Data  
         run: |
           dvc pull -v || echo "⚠️ DVC local Pull Failed, continuing..."
           ls -lah data/processed/  # Debugging: Check if files exist
+
+      - name: Export DAGSHUB_PAT
+        run: echo "DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
+
+      - name: Authenticate MLflow
+        run: |
+          export MLFLOW_TRACKING_URI="https://dagshub.com/InsightfulSantosh/mlops-mini_project.mlflow"
+          export MLFLOW_TRACKING_USERNAME=${{ secrets.DAGSHUB_PAT }}
+          export MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_PAT }}
+
 
       - name: Run Pipeline
         env:           
