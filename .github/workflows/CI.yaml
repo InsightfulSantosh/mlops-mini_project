@@ -48,7 +48,7 @@ jobs:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
 
         run: |
-          dvc repro
+          dvc repro -f
 
       - name : DVC push
         run: |
