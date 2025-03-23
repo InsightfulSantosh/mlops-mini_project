@@ -93,7 +93,7 @@ def bow(train: pd.DataFrame, test: pd.DataFrame, max_feature: int):
         with open("models/vectorizer.pkl", 'wb') as file:
             pickle.dump(vectorizer, file)
 
-        logger.debug("Vectorizer saved successfully to models/vectorizer.pkl")
+        logger.debug(f"Vectorizer with {max_feature} features saved successfully to models/vectorizer.pkl")
         
         return train_df, test_df
     except Exception as e:

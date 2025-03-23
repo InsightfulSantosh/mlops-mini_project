@@ -12,7 +12,12 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 # Initialize DagsHub MLflow tracking
-dagshub.init(repo_owner="InsightfulSantosh", repo_name="mlops-mini_project", mlflow=True)
+dagshub_url = "https://dagshub.com"
+repo_owner = "InsightfulSantosh"
+repo_name = "mlops-mini_project"
+
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 def promote_model_with_alias(model_name: str, model_version: str, alias: str):
     """
