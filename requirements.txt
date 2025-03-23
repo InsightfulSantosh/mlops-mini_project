@@ -125,8 +125,8 @@ matplotlib==3.10.0
 matplotlib-inline==0.1.7
 mdurl==0.1.2
 mistune==3.1.2
-mlflow==2.20.2
-mlflow-skinny==2.20.2
+mlflow==2.21.0
+mlflow-skinny==2.21.0
 multidict==6.1.0
 nbclient==0.10.2
 nbconvert==7.16.6
@@ -230,3 +230,5 @@ wrapt==1.17.2
 yarl==1.18.3
 zc.lockfile==3.0.post1
 zipp==3.21.0
+streamlit
+onnxruntime
