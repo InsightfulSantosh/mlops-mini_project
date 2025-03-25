@@ -63,3 +63,8 @@ jobs:
 
       - name: Check DVC Status
         run: dvc status
+
+
+      - name: Promote model to production
+       
+        run: python script/promote.py

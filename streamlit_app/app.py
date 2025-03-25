@@ -3,6 +3,7 @@ import os
 from model_utils import load_model, load_vectorizer, predict_sentiment, get_latest_model_version
 from preprocessing import normalize_text
 import dagshub
+import mlflow
 # Retrieve DagsHub credentials from environment variables
 dagshub_token = os.getenv("DAGSHUB_PAT")
 
@@ -14,7 +15,12 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 # Initialize DagsHub MLflow tracking
-dagshub.init(repo_owner="InsightfulSantosh", repo_name="mlops-mini_project", mlflow=True)
+dagshub_url = "https://dagshub.com"
+repo_owner = "InsightfulSantosh"
+repo_name = "mlops-mini_project"
+
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 #✅ Get Model Name from Environment Variable
 MODEL_NAME = os.getenv("MODEL_NAME", "randomforest")

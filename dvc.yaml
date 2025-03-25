@@ -52,4 +52,5 @@ stages:
      deps : 
       - src/model/model_registry.py
       - reports/model_info.json
-      
+
+    

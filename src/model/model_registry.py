@@ -109,7 +109,7 @@ def main():
         logger.info("🚀 Starting model registry pipeline...")
 
         model_info = load_model_info(model_info_path)
-        model_name = "randomforest"
+        model_name = "uma"
 
         model_registry(model_name, model_info)
         logger.info("✅ Model registry pipeline completed successfully.")
