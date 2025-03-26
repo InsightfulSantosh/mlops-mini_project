@@ -23,7 +23,7 @@ repo_name = "mlops-mini_project"
 mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 #✅ Get Model Name from Environment Variable
-MODEL_NAME = os.getenv("MODEL_NAME", "randomforest")
+MODEL_NAME = os.getenv("MODEL_NAME", "uma")
 
 # ✅ Fetch the latest production model using alias
 MODEL_VERSION = get_latest_model_version(MODEL_NAME)
