@@ -72,7 +72,7 @@ jobs:
         if: success()
         run: python script/promote.py
 
-      - name: Log in to Docker Hub **(Only Once)**
+      - name: Log in to Docker Hub **(Only O
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
