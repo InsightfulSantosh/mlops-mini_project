@@ -90,7 +90,7 @@ jobs:
     needs: project-testing
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       security-events: write
 
@@ -98,29 +98,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensures full history and files are pulled
+          fetch-depth: 0
 
-      - name: Set IMAGE_TAG
+      - name: Set Environment Variables
         run: |
-          IMAGE_TAG=$(git rev-parse --short HEAD || echo 'latest')
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "Resolved IMAGE_TAG=$IMAGE_TAG"
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set region $AWS_REGION
 
-      - name: Check for Dockerfile
+      - name: Install DVC in Docker Build Job
         run: |
-          if [ ! -f dockerfile ]; then 
-            echo "Dockerfile not found!"
-            exit 1
-          else
-            echo "Dockerfile found."
-          fi
+          python -m pip install --upgrade pip
+          pip install dvc dvc-s3
+          which dvc || (echo "DVC installation failed!" && exit 1)
 
-      - name: Pull DVC Data (Ensure vectorizer.pkl is Available)
+      - name: Verify Model File & Pull if Missing
         run: |
-          dvc pull -v || echo "No DVC data to pull or pull failed"
-          if [ ! -f vectorizer.pkl ]; then
-            echo "vectorizer.pkl not found! Stopping build."
-            exit 1
+          if [ ! -f models/vectorizer.pkl ]; then
+            echo "vectorizer.pkl not found! Pulling from DVC..."
+            dvc pull -v || echo "No DVC data to pull or pull failed"
           else
             echo "vectorizer.pkl found."
           fi
@@ -131,19 +130,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
-        if: success()
+      - name: Build Docker Image
         run: |
           docker build -t insightfulsantosh/sentiment .
 
-      - name: Tag Docker image
-        if: success()
-        run: |
-          docker tag insightfulsantosh/sentiment:latest
-
       - name: Push Docker Image to Docker Hub
-        if: success()
         run: |
-          docker push insightfulsantosh/sentiment:latest
+          docker push insightfulsantosh/sentiment
 
 
