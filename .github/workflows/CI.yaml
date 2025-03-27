@@ -58,15 +58,11 @@ jobs:
           aws configure set region $AWS_REGION
           dvc pull -v && echo "DVC data pulled successfully." || echo "No DVC data to pull."
 
-      - name: Verify Model File & Pull if Missing
+      - name: Pull Data and Models from DVC
         run: |
-          if [ ! -f models/vectorizer.pkl ]; then
-            echo "vectorizer.pkl not found! Pulling from DVC..."
-            dvc pull -v || echo "DVC pull failed!"
-          else
-            echo "vectorizer.pkl found."
-          fi
-
+          dvc pull data/ models/ -v || { echo "DVC pull failed! Exiting."; exit 1; }
+          ls -lah data/ models/ || { echo "Required files missing! Exiting."; exit 1; }
+      
       - name: Run Pipeline
         run: |
           dvc repro -f
