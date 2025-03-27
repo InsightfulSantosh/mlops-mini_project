@@ -122,11 +122,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker Image
+      - name: Build Docker image
+        if: success()
         run: |
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/sentiment"
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-          echo "Docker image built successfully."
-          docker images | grep sentiment  # Debugging step
+          docker build -t insightfulsantosh/sentiment .
+
+      - name: Tag Docker image
+        if: success()
+        run: |
+          docker tag insightfulsantosh/sentiment:latest
 
