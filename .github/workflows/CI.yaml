@@ -86,7 +86,7 @@ jobs:
         if: success()
         run: python script/promote.py
 
-  docker-build-and-push:
+  debug-docker-build-and-push:
     needs: project-testing
     runs-on: ubuntu-latest
     permissions:
@@ -100,7 +100,18 @@ jobs:
 
       - name: Set IMAGE_TAG
         run: |
-          echo "IMAGE_TAG=$(git rev-parse --short HEAD || echo 'latest')" >> $GITHUB_ENV
+          IMAGE_TAG=$(git rev-parse --short HEAD || echo 'latest')
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "Resolved IMAGE_TAG=$IMAGE_TAG"
+
+      - name: Check for Dockerfile
+        run: |
+          if [ ! -f Dockerfile ]; then 
+            echo "❌ Dockerfile not found!" 
+            exit 1
+          else
+            echo "✅ Dockerfile found."
+          fi
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -113,9 +124,6 @@ jobs:
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/sentiment"
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
           docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+          echo "✅ Docker image built successfully."
+          docker images | grep sentiment  # Debugging step
 
-      - name: Push Docker Image to Docker Hub
-        run: |
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/sentiment"
-          docker push $IMAGE_NAME:$IMAGE_TAG
-          docker push $IMAGE_NAME:latest
