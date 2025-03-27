@@ -109,11 +109,11 @@ jobs:
 
       - name: Check for Dockerfile
         run: |
-          if [ ! -f Dockerfile ]; then 
-            echo "❌ Dockerfile not found!" 
+          if [ ! -f dockerfile ]; then 
+            echo  "Dockerfile not found!" 
             exit 1
           else
-            echo "✅ Dockerfile found."
+            echo "Dockerfile found."
           fi
 
       - name: Login to Docker Hub
@@ -127,6 +127,6 @@ jobs:
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/sentiment"
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
           docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-          echo "✅ Docker image built successfully."
+          echo "Docker image built successfully."
           docker images | grep sentiment  # Debugging step
 
