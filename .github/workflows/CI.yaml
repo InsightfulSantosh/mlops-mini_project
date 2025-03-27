@@ -63,8 +63,13 @@ jobs:
 
       - name: Check DVC Status
         run: dvc status
-
+      
+      - name: model testing 
+        env:
+          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+        run: |
+          python -m unittest tests/model_test.py
 
       - name: Promote model to production
-       
+        if: success()
         run: python script/promote.py
