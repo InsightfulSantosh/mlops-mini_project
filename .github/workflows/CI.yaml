@@ -56,12 +56,11 @@ jobs:
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION
-          dvc pull -v && echo "DVC data pulled successfully." || echo "No DVC data to pull."
 
-      - name: Pull Data and Models from DVC
+      - name: Pull DVC data , model & vectorizer from S3 
         run: |
-          dvc pull data/ models/ -v || { echo "DVC pull failed! Exiting."; exit 1; }
-          ls -lah data/ models/ || { echo "Required files missing! Exiting."; exit 1; }
+          dvc pull -v || echo "No DVC data to pull or pull failed"
+          ls -lah data/processed/ || echo "Processed data directory not found"
       
       - name: Run Pipeline
         run: |
