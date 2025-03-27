@@ -81,11 +81,10 @@ jobs:
       - name: Build, Tag, and Push Docker Image **(All in One Step)**
         if: success()
         run: |
-          IMAGE_TAG=$(git rev-parse --short HEAD)  # Get latest commit SHA
-          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/sentiment
-          
-          # Build image
-          docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest .
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/sentiment"
 
-          # Push all tags at once
-          docker push --all-tags $IMAGE_NAME
+          # Build the image with 'latest' tag only
+          docker build -t $IMAGE_NAME:latest .
+
+          # Push the image
+          docker push $IMAGE_NAME:latest
