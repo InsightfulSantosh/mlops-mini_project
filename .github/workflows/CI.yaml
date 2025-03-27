@@ -100,7 +100,6 @@ jobs:
         with:
           fetch-depth: 0  # Ensures full history and files are pulled
 
-
       - name: Set IMAGE_TAG
         run: |
           IMAGE_TAG=$(git rev-parse --short HEAD || echo 'latest')
@@ -110,10 +109,20 @@ jobs:
       - name: Check for Dockerfile
         run: |
           if [ ! -f dockerfile ]; then 
-            echo  "Dockerfile not found!" 
+            echo "Dockerfile not found!"
             exit 1
           else
             echo "Dockerfile found."
+          fi
+
+      - name: Pull DVC Data (Ensure vectorizer.pkl is Available)
+        run: |
+          dvc pull -v || echo "No DVC data to pull or pull failed"
+          if [ ! -f models/vectorizer.pkl ]; then
+            echo "vectorizer.pkl not found! Stopping build."
+            exit 1
+          else
+            echo "vectorizer.pkl found."
           fi
 
       - name: Login to Docker Hub
@@ -131,4 +140,10 @@ jobs:
         if: success()
         run: |
           docker tag insightfulsantosh/sentiment:latest
+
+      - name: Push Docker Image to Docker Hub
+        if: success()
+        run: |
+          docker push insightfulsantosh/sentiment:latest
+
 
