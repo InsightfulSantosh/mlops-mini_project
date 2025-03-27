@@ -86,28 +86,10 @@ jobs:
         if: success()
         run: python script/promote.py
 
-  debug-docker-build-and-push:
-    needs: project-testing
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-      security-events: write
-
-    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Set Environment Variables
-        run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-          aws configure set region $AWS_REGION
 
       - name: Install DVC in Docker Build Job
         run: |
