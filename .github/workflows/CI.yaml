@@ -118,7 +118,7 @@ jobs:
       - name: Pull DVC Data (Ensure vectorizer.pkl is Available)
         run: |
           dvc pull -v || echo "No DVC data to pull or pull failed"
-          if [ ! -f models/vectorizer.pkl ]; then
+          if [ ! -f vectorizer.pkl ]; then
             echo "vectorizer.pkl not found! Stopping build."
             exit 1
           else
