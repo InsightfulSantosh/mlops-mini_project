@@ -97,6 +97,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history and files are pulled
+
 
       - name: Set IMAGE_TAG
         run: |
