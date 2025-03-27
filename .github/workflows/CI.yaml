@@ -12,8 +12,6 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
-  PROJECT_NAME: sentiment
-  MLFLOW_TRACKING_URI: https://dagshub.com/InsightfulSantosh/mlops-mini_project.mlflow
 
 jobs:
   project-testing:
