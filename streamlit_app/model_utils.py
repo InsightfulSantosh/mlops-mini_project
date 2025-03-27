@@ -12,12 +12,12 @@ def get_latest_model_version(model_name):
     """
     client = mlflow.MlflowClient()
     try:
-        # ✅ Fetch model version using alias
+        # Fetch model version using alias
         alias_version = client.get_model_version_by_alias(model_name, "production")
         if alias_version:
             return alias_version.version  # Return the production version
 
-        # ✅ Fallback: Get the latest registered version
+        # Fallback: Get the latest registered version
         all_versions = client.search_model_versions(f"name='{model_name}'", order_by=["version DESC"])
         if all_versions:
             return all_versions[0].version  # Return the most recent version
@@ -33,10 +33,10 @@ def load_model(model_name: str, model_version: str):
         model_uri = f"models:/{model_name}/{model_version}"
         return mlflow.pyfunc.load_model(model_uri)
     except Exception as e:
-        print(f"⚠️ MLflow model loading failed: {e}")
+        print(f"MLflow model loading failed: {e}")
         onnx_path = f"models/{model_name}.onnx"
         if os.path.exists(onnx_path):
-            print("🔄 Loading ONNX model for faster inference...")
+            print("Loading ONNX model for faster inference...")
             return ort.InferenceSession(onnx_path)
         raise RuntimeError(f"Error loading model: {e}")
 
@@ -63,4 +63,4 @@ def predict_sentiment(model, vectorizer, text_list):
         return sentiment_labels.get(result[0], "Unknown")
 
     except Exception as e:
-        raise RuntimeError(f"❌ Prediction failed: {e}")
+        raise RuntimeError(f"Prediction failed: {e}")

@@ -1,8 +1,10 @@
 import mlflow
 import os
 import dagshub
+import joblib
+import pandas as pd  # Import missing pandas
 
-"""Set up MLflow tracking and load the latest model."""
+# Set up MLflow tracking and load the latest model
 dagshub_token = os.getenv("DAGSHUB_PAT")
 if not dagshub_token:
     raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
@@ -25,4 +27,17 @@ def get_latest_model_version(model_name):
 model_name = "uma"
 latest_version = get_latest_model_version(model_name)
 model_uri = f"models:/{model_name}/{latest_version}"
-print(latest_version)
+model = mlflow.pyfunc.load_model(model_uri)
+
+# Load vectorizer
+with open("./models/vectorizer.pkl", 'rb') as vect:
+    vector = joblib.load(vect)
+
+text = "i am sad disgusting disaster worst bad"
+
+# Fix: `transform()` needs a list
+x = vector.transform([text])
+features_df = pd.DataFrame(x.toarray())
+
+# Make prediction
+print(model.predict(features_df)[0])
