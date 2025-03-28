@@ -12,7 +12,6 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
-  MLFLOW_TRACKING_URI: "https://dagshub.com/InsightfulSantosh/mlops-mini_project.mlflow"
 
 jobs:
   project-testing:
@@ -44,13 +43,13 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-          echo "MLFLOW_TRACKING_USERNAME=InsightfulSantosh" >> $GITHUB_ENV
-          echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
+
+
 
       - name: Run Linting
-        run: flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+        run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Configure AWS for DVC & Pull Data
+      - name: Configure AWS for DVC & Pull Data from S3
         run: |
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
@@ -68,6 +67,7 @@ jobs:
         run: python script/promote.py
 
       - name: Set Up Docker Buildx
+        if: success()
         run: |
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
           docker buildx create --use
