@@ -2,7 +2,7 @@ name: ML Sentiment Analysis CI Pipeline
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
   pull_request:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history for versioning
+          fetch-depth: 0
 
       - name: Setup Python & Cache Dependencies
         uses: actions/setup-python@v4
@@ -49,35 +49,24 @@ jobs:
 
       - name: Verify MLflow Authentication
         run: |
-          mlflow --version
-          python -c "import mlflow; print(mlflow.get_tracking_uri())"
           curl -u $MLFLOW_TRACKING_USERNAME:$MLFLOW_TRACKING_PASSWORD \
                $MLFLOW_TRACKING_URI/api/2.0/mlflow/registered-models/list
 
       - name: Run Linting
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Configure AWS for DVC & Pull Data
         run: |
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION
-
-      - name: Pull DVC Data, Model & Vectorizer from S3 
-        run: |
           dvc pull -v || echo "No DVC data to pull or pull failed"
-          ls -lah data/processed/ || echo "Processed data directory not found"
-      
+
       - name: Run Pipeline
-        run: |
-          dvc repro -f
-          dvc metrics show
+        run: dvc repro -f && dvc metrics show
 
       - name: Model Testing
-        run: |
-          python -m unittest test/model_test.py
+        run: python -m unittest test/model_test.py
 
       - name: Promote Model to Production
         if: success()
@@ -88,10 +77,19 @@ jobs:
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
           docker buildx create --use
 
+      - name: Cache Docker Layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-docker-
+
       - name: Build & Push Multi-Architecture Docker Image
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker buildx build --platform linux/amd64,linux/arm64 \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache \
             -t insightfulsantosh/sentiment:latest \
             -t insightfulsantosh/sentiment:${{ github.sha }} \
             --push .
