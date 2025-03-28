@@ -47,13 +47,8 @@ jobs:
           echo "MLFLOW_TRACKING_USERNAME=InsightfulSantosh" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
 
-      - name: Verify MLflow Authentication
-        run: |
-          curl -u $MLFLOW_TRACKING_USERNAME:$MLFLOW_TRACKING_PASSWORD \
-               $MLFLOW_TRACKING_URI/api/2.0/mlflow/registered-models/list
-
       - name: Run Linting
-        run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        run: flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Configure AWS for DVC & Pull Data
         run: |
@@ -91,5 +86,4 @@ jobs:
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache \
             -t insightfulsantosh/sentiment:latest \
-            -t insightfulsantosh/sentiment:${{ github.sha }} \
             --push .
