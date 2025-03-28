@@ -12,6 +12,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
+  MLFLOW_TRACKING_URI: "https://dagshub.com/InsightfulSantosh/mlops-mini_project.mlflow"
 
 jobs:
   project-testing:
@@ -35,7 +36,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pytest coverage flake8 dvc dvc-s3
+          pip install -r requirements.txt pytest coverage flake8 dvc dvc-s3 mlflow boto3
 
       - name: Set Environment Variables
         run: |
@@ -43,8 +44,15 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-          echo "MLFLOW_TRACKING_USERNAME=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
+          echo "MLFLOW_TRACKING_USERNAME=InsightfulSantosh" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_PAT }}" >> $GITHUB_ENV
+
+      - name: Verify MLflow Authentication
+        run: |
+          mlflow --version
+          python -c "import mlflow; print(mlflow.get_tracking_uri())"
+          curl -u $MLFLOW_TRACKING_USERNAME:$MLFLOW_TRACKING_PASSWORD \
+               $MLFLOW_TRACKING_URI/api/2.0/mlflow/registered-models/list
 
       - name: Run Linting
         run: |
@@ -57,7 +65,7 @@ jobs:
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION
 
-      - name: Pull DVC data , model & vectorizer from S3 
+      - name: Pull DVC Data, Model & Vectorizer from S3 
         run: |
           dvc pull -v || echo "No DVC data to pull or pull failed"
           ls -lah data/processed/ || echo "Processed data directory not found"
@@ -87,4 +95,3 @@ jobs:
             -t insightfulsantosh/sentiment:latest \
             -t insightfulsantosh/sentiment:${{ github.sha }} \
             --push .
-
