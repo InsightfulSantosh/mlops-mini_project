@@ -1,7 +1,8 @@
-import pickle
-import pandas as pd
-import os
 import logging
+import os
+import pickle
+
+import pandas as pd
 import yaml
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -20,7 +21,7 @@ log_file_path = "pipeline-logs/3.feature_engineering.log"
 # Delete the log file if it exists
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
-    
+
 # FileHandler to log messages to a file
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
@@ -30,13 +31,14 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and attach it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 console_handler.setFormatter(formatter)
 
 # Add handlers to the logger
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
+
 
 def load_params(params_path: str) -> dict:
     """Load parameters from a YAML file."""
@@ -57,6 +59,7 @@ def load_params(params_path: str) -> dict:
         logger.error("Unexpected error: %s", e)
         raise
 
+
 def load_data(path: str) -> pd.DataFrame:
     """Load data from a CSV file."""
     try:
@@ -70,6 +73,7 @@ def load_data(path: str) -> pd.DataFrame:
     except Exception as e:
         logger.error("Error loading file %s: %s", path, e)
         raise
+
 
 def bow(train: pd.DataFrame, test: pd.DataFrame, max_feature: int):
     """Perform Bag-of-Words transformation."""
@@ -90,15 +94,18 @@ def bow(train: pd.DataFrame, test: pd.DataFrame, max_feature: int):
 
         # Ensure the models directory exists
         os.makedirs("models", exist_ok=True)
-        with open("models/vectorizer.pkl", 'wb') as file:
+        with open("models/vectorizer.pkl", "wb") as file:
             pickle.dump(vectorizer, file)
 
-        logger.debug(f"Vectorizer with {max_feature} features saved successfully to models/vectorizer.pkl")
-        
+        logger.debug(
+            f"Vectorizer with {max_feature} features saved successfully to models/vectorizer.pkl"
+        )
+
         return train_df, test_df
     except Exception as e:
         logger.error("Error in Bag-of-Words transformation: %s", e)
         raise
+
 
 def save_data(df: pd.DataFrame, path: str):
     """Save data to a CSV file."""
@@ -108,6 +115,7 @@ def save_data(df: pd.DataFrame, path: str):
     except Exception as e:
         logger.error("Error saving data to %s: %s", path, e)
         raise
+
 
 def main():
     try:
@@ -131,7 +139,7 @@ def main():
     except Exception as e:
         logger.error("Error in Bag-of-Words transformation: %s", e)
         return
-    
+
     try:
         os.makedirs("data/processed", exist_ok=True)
         save_data(train_df, os.path.join("data", "processed", "train_bow.csv"))
@@ -139,6 +147,7 @@ def main():
     except Exception as e:
         logger.error("Error saving data: %s", e)
         return
+
 
 if __name__ == "__main__":
     main()

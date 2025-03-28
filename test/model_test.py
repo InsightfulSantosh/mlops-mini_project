@@ -1,13 +1,18 @@
-import unittest
-import mlflow
-import os
-import pandas as pd
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import pickle
 import logging
+import os
+import pickle
+import unittest
+
+import mlflow
+import pandas as pd
+from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                             recall_score)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class TestModelLoading(unittest.TestCase):
 
@@ -33,11 +38,13 @@ class TestModelLoading(unittest.TestCase):
         cls.new_model_name = "uma"
         client = mlflow.MlflowClient()
         latest_versions = client.search_model_versions(f"name='{cls.new_model_name}'")
-        
+
         if not latest_versions:
             raise ValueError(f"No valid model version found for {cls.new_model_name}")
-        
-        cls.new_model_version = max(latest_versions, key=lambda v: int(v.version)).version
+
+        cls.new_model_version = max(
+            latest_versions, key=lambda v: int(v.version)
+        ).version
         cls.new_model_uri = f"models:/{cls.new_model_name}/{cls.new_model_version}"
         logging.info(f"Loading model from URI: {cls.new_model_uri}")
 
@@ -69,13 +76,19 @@ class TestModelLoading(unittest.TestCase):
         """Test if the model signature matches expected input and output shapes."""
         input_text = "hi how are you"
         input_data = self.vectorizer.transform([input_text])
-        input_df = pd.DataFrame(input_data.toarray(), columns=[str(i) for i in range(input_data.shape[1])])
+        input_df = pd.DataFrame(
+            input_data.toarray(), columns=[str(i) for i in range(input_data.shape[1])]
+        )
 
         # Predict using the model
         prediction = self.new_model.predict(input_df)
 
         # Verify input shape
-        self.assertEqual(input_df.shape[1], len(self.vectorizer.get_feature_names_out()), "Input shape mismatch")
+        self.assertEqual(
+            input_df.shape[1],
+            len(self.vectorizer.get_feature_names_out()),
+            "Input shape mismatch",
+        )
 
         # Verify output shape (assuming binary classification with a single output)
         self.assertEqual(len(prediction), input_df.shape[0], "Output length mismatch")
@@ -104,10 +117,19 @@ class TestModelLoading(unittest.TestCase):
         }
 
         # Check if performance meets expectations
-        self.assertGreaterEqual(accuracy_new, expected_thresholds["accuracy"], "Accuracy below threshold")
-        self.assertGreaterEqual(precision_new, expected_thresholds["precision"], "Precision below threshold")
-        self.assertGreaterEqual(recall_new, expected_thresholds["recall"], "Recall below threshold")
-        self.assertGreaterEqual(f1_new, expected_thresholds["f1_score"], "F1 score below threshold")
+        self.assertGreaterEqual(
+            accuracy_new, expected_thresholds["accuracy"], "Accuracy below threshold"
+        )
+        self.assertGreaterEqual(
+            precision_new, expected_thresholds["precision"], "Precision below threshold"
+        )
+        self.assertGreaterEqual(
+            recall_new, expected_thresholds["recall"], "Recall below threshold"
+        )
+        self.assertGreaterEqual(
+            f1_new, expected_thresholds["f1_score"], "F1 score below threshold"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

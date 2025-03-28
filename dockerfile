@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY streamlit_app/ /app/
 COPY models/vectorizer.pkl /app/models/vectorizer.pkl
 
-# Expose the correct port
+# Expose the correct port``
 EXPOSE 8501  
 
 # Use the correct CMD for Streamlit or Flask

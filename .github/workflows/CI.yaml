@@ -75,8 +75,16 @@ jobs:
         if: success()
         run: python script/promote.py
 
-      - name: Build & Push Docker Image
+      - name: Set Up Docker Buildx
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker buildx create --use
+
+      - name: Build & Push Multi-Architecture Docker Image
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker build -t insightfulsantosh/sentiment .
-          docker push insightfulsantosh/sentiment
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t insightfulsantosh/sentiment:latest \
+            -t insightfulsantosh/sentiment:${{ github.sha }} \
+            --push .
+

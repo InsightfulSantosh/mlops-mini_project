@@ -1,9 +1,11 @@
+import os
+
+import joblib
 import mlflow
 import mlflow.pyfunc
-import joblib
 import onnxruntime as ort
 import pandas as pd
-import os
+
 
 def get_latest_model_version(model_name):
     """
@@ -18,7 +20,9 @@ def get_latest_model_version(model_name):
             return alias_version.version  # Return the production version
 
         # Fallback: Get the latest registered version
-        all_versions = client.search_model_versions(f"name='{model_name}'", order_by=["version DESC"])
+        all_versions = client.search_model_versions(
+            f"name='{model_name}'", order_by=["version DESC"]
+        )
         if all_versions:
             return all_versions[0].version  # Return the most recent version
 
@@ -26,6 +30,7 @@ def get_latest_model_version(model_name):
 
     except Exception as e:
         raise RuntimeError(f"Error retrieving model version: {e}")
+
 
 def load_model(model_name: str, model_version: str):
     """Load MLflow model, with fallback to ONNX model if available."""
@@ -40,12 +45,14 @@ def load_model(model_name: str, model_version: str):
             return ort.InferenceSession(onnx_path)
         raise RuntimeError(f"Error loading model: {e}")
 
+
 def load_vectorizer(vectorizer_path: str):
     """Load vectorizer using joblib (faster than pickle)."""
     try:
         return joblib.load(vectorizer_path)
     except Exception as e:
         raise RuntimeError(f"Error loading vectorizer: {e}")
+
 
 def predict_sentiment(model, vectorizer, text_list):
     """Transform text and make sentiment prediction (0 -> Sad, 1 -> Happy)."""
@@ -55,7 +62,9 @@ def predict_sentiment(model, vectorizer, text_list):
 
         if isinstance(model, ort.InferenceSession):  # If ONNX model
             input_name = model.get_inputs()[0].name
-            result = model.run(None, {input_name: features_df.astype("float32").to_numpy()})[0]
+            result = model.run(
+                None, {input_name: features_df.astype("float32").to_numpy()}
+            )[0]
         else:  # MLflow model
             result = model.predict(features_df)
 

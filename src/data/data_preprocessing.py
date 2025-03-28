@@ -1,14 +1,15 @@
-import re
-import pandas as pd
-import os
-import nltk
-from nltk.corpus import stopwords    # For stopwords
-from nltk.stem import WordNetLemmatizer # For stemming and lemmatization
 import logging
+import os
+import re
+
+import nltk
+import pandas as pd
+from nltk.corpus import stopwords  # For stopwords
+from nltk.stem import WordNetLemmatizer  # For stemming and lemmatization
 
 # Downloading NLTK data
-nltk.download('stopwords')   # Downloading stopwords data
-nltk.download('wordnet')     # Downloading WordNet data for lemmatization
+nltk.download("stopwords")  # Downloading stopwords data
+nltk.download("wordnet")  # Downloading WordNet data for lemmatization
 
 # Set up logger
 logger = logging.getLogger("data_cleaning")
@@ -31,13 +32,14 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and attach it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 console_handler.setFormatter(formatter)
 
 # Add handlers to the logger
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
+
 
 def data_cleaning(text_series):
     """Cleans the text data by removing URLs, emails, numbers, and punctuation."""
@@ -63,37 +65,49 @@ def data_cleaning(text_series):
         logger.error(f"Error during data cleaning: {e}")
         raise
 
+
 def remove_short_words(text_series, min_length=3):
     """Removes words shorter than `min_length` characters."""
     try:
-        cleaned_text = text_series.apply(lambda x: " ".join([word for word in x.split() if len(word) >= min_length]))
+        cleaned_text = text_series.apply(
+            lambda x: " ".join([word for word in x.split() if len(word) >= min_length])
+        )
         logger.debug(f"Removed short words (length < {min_length}) successfully.")
         return cleaned_text
     except Exception as e:
         logger.error(f"Error removing short words: {e}")
         raise
 
+
 def lemmatization(text_series):
     """Lemmatizes words using WordNetLemmatizer."""
     try:
         lemmatizer = WordNetLemmatizer()
-        lemmatized_text = text_series.apply(lambda x: " ".join([lemmatizer.lemmatize(word, pos="v") for word in x.split()]))
+        lemmatized_text = text_series.apply(
+            lambda x: " ".join(
+                [lemmatizer.lemmatize(word, pos="v") for word in x.split()]
+            )
+        )
         logger.debug("Lemmatization completed successfully.")
         return lemmatized_text
     except Exception as e:
         logger.error(f"Error during lemmatization: {e}")
         raise
 
+
 def remove_stopwords(text_series):
     """Removes stopwords from text."""
     try:
         stop_words = frozenset(stopwords.words("english"))  # Faster lookup
-        cleaned_text = text_series.apply(lambda x: " ".join([word for word in x.split() if word not in stop_words]))
+        cleaned_text = text_series.apply(
+            lambda x: " ".join([word for word in x.split() if word not in stop_words])
+        )
         logger.debug("Stopwords removed successfully.")
         return cleaned_text
     except Exception as e:
         logger.error(f"Error removing stopwords: {e}")
         raise
+
 
 def normalize(df):
     """Applies text preprocessing steps."""
@@ -109,18 +123,19 @@ def normalize(df):
         logger.error(f"Error during data normalization: {e}")
         raise
 
+
 def make_dir():
     """Creates required directories if they don't exist."""
     try:
         base_folder = os.path.abspath("./data")
-        
+
         # Ensure base folder exists
         if not os.path.exists(base_folder):
             os.makedirs(base_folder)
             logger.debug(f"Base directory created: {base_folder}")
-        
+
         data_path = os.path.join(base_folder, "interim")
-        
+
         # Create interim folder
         if not os.path.exists(data_path):
             os.makedirs(data_path)
@@ -130,6 +145,7 @@ def make_dir():
     except Exception as e:
         logger.error(f"Error in making directories: {e}")
         raise  # Re-raise exception to propagate it
+
 
 def main():
     try:
@@ -179,6 +195,7 @@ def main():
 
     except Exception as e:
         logger.critical("🔥 Data cleaning process failed!", exc_info=True)
+
 
 if __name__ == "__main__":
     main()

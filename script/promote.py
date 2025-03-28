@@ -1,7 +1,9 @@
 import os
+
+import dagshub
 import mlflow
 from mlflow.tracking import MlflowClient
-import dagshub
+
 
 def setup_mlflow():
     """Set up MLflow tracking with DagsHub credentials."""
@@ -18,6 +20,7 @@ def setup_mlflow():
 
     mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
     return MlflowClient()
+
 
 def get_latest_model_version(model_name):
     """Fetch the latest registered model version."""
@@ -38,6 +41,7 @@ def get_latest_model_version(model_name):
         print(f" Error fetching model: {e}")
         return None
 
+
 def promote_model_to_production(model_name):
     """Promote the latest version of a model to 'production' alias."""
     client = setup_mlflow()
@@ -49,16 +53,15 @@ def promote_model_to_production(model_name):
 
     try:
         client.set_registered_model_alias(
-            name=model_name,
-            alias="production",
-            version=latest_version
+            name=model_name, alias="production", version=latest_version
         )
-        print(f" Model '{model_name}' version '{latest_version}' is now in 'production'.")
+        print(
+            f" Model '{model_name}' version '{latest_version}' is now in 'production'."
+        )
     except Exception as e:
         print(f"Error promoting model: {e}")
 
+
 if __name__ == "__main__":
-    model_name = "uma"  
+    model_name = "uma"
     promote_model_to_production(model_name)
-
-

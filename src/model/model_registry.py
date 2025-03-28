@@ -1,9 +1,10 @@
-import os
 import json
 import logging
+import os
+
+import dagshub
 import mlflow
 from mlflow.tracking import MlflowClient
-import dagshub
 
 # ---------------------- SETUP DAGSHUB MLflow TRACKING ----------------------
 dagshub_token = os.getenv("DAGSHUB_PAT")
@@ -18,7 +19,7 @@ repo_owner = "InsightfulSantosh"
 repo_name = "mlops-mini_project"
 
 # Set up MLflow tracking URI
-mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
 
 # ---------------------- SETUP LOGGING ----------------------
 logger = logging.getLogger("model_registry")
@@ -38,7 +39,9 @@ if os.path.exists(log_file_path):
 
 # Setup logging handlers
 handler = logging.FileHandler(log_file_path)
-handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+handler.setFormatter(
+    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+)
 logger.addHandler(handler)
 logger.addHandler(logging.StreamHandler())  # Print logs to console
 
@@ -75,27 +78,33 @@ def model_registry(model_name, model_info):
         # Register the model
         client = MlflowClient()
         result = mlflow.register_model(model_uri, model_name)
-        logger.info(f"✅ Model registered successfully: {model_name} (Version {result.version})")
+        logger.info(
+            f"✅ Model registered successfully: {model_name} (Version {result.version})"
+        )
 
         # Wait for model registration to complete
         import time
+
         time.sleep(5)
 
         # Log additional model metadata
         client.update_model_version(
             name=model_name,
             version=result.version,
-            description="Tweet Emotion Classification Model"
+            description="Tweet Emotion Classification Model",
         )
         client.set_model_version_tag(model_name, result.version, "author", "Santosh")
         client.set_model_version_tag(model_name, result.version, "use_case", "NLP")
-        client.set_model_version_tag(model_name, result.version, "version_notes", "Initial model deployment")
+        client.set_model_version_tag(
+            model_name, result.version, "version_notes", "Initial model deployment"
+        )
 
         # Assign alias to model version
         alias = "staging"  # Change to "staging", "testing", etc., as needed
         client.set_registered_model_alias(model_name, alias, result.version)
-        logger.info(f"✅ Model '{model_name}' assigned alias '{alias}' (Version {result.version})")
-
+        logger.info(
+            f"✅ Model '{model_name}' assigned alias '{alias}' (Version {result.version})"
+        )
 
     except Exception as e:
         logger.error(f"❌ Error during model registration: {str(e)}")
@@ -118,5 +127,5 @@ def main():
         logger.error(f"❌ Pipeline execution failed: {str(e)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
